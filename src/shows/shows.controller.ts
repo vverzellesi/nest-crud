@@ -8,35 +8,35 @@ import {
   Delete,
 } from '@nestjs/common';
 import { ShowsService } from './shows.service';
-import { CreateShowDto } from './dto/create-show.dto';
-import { UpdateShowDto } from './dto/update-show.dto';
+import { Show } from './entities/show.entity';
 
 @Controller('shows')
 export class ShowsController {
+  // eslint-disable-next-line prettier/prettier
   constructor(private readonly showsService: ShowsService) { }
 
-  @Post()
-  create(@Body() createShowDto: CreateShowDto) {
-    return this.showsService.create(createShowDto);
-  }
-
   @Get()
-  findAll() {
+  async findAll(): Promise<Show[]> {
     return this.showsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string): Promise<Show> {
     return this.showsService.findOne(+id);
   }
 
+  @Post()
+  async create(@Body() show: Show): Promise<Show> {
+    return this.showsService.create(show);
+  }
+
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateShowDto: UpdateShowDto) {
-    return this.showsService.update(+id, updateShowDto);
+  async update(@Param('id') id: string, @Body() show: Show): Promise<void> {
+    this.showsService.update(+id, show);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.showsService.remove(+id);
+  async remove(@Param('id') id: string): Promise<void> {
+    this.showsService.remove(+id);
   }
 }
