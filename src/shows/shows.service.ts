@@ -1,45 +1,35 @@
 import { Injectable } from '@nestjs/common';
-// import { CreateShowDto } from './dto/create-show.dto';
-import { UpdateShowDto } from './dto/update-show.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { CreateShowDto } from './dto/create-show.dto';
+// import { UpdateShowDto } from './dto/update-show.dto';
 import { Show } from './entities/show.entity';
+import { ShowDocument } from './schemas/show.schema';
 
 @Injectable()
 export class ShowsService {
-  shows: Show[] = [
-    { id: 1, name: 'Modern Family', genre: 'Comedy', stars: 5 },
-    { id: 2, name: 'The Office', genre: 'Comedy', stars: 5 },
-    { id: 3, name: 'La Casa de Papel', genre: 'Drama', stars: 4 },
-  ];
+  constructor(@InjectModel(Show.name) private showModel: Model<ShowDocument>) { }
 
-  findAll() {
-    return this.shows;
+  async findAll() {
+    return await this.showModel.find().exec();
   }
 
-  findOne(id: number) {
-    return this.shows.find((show) => show.id === id);
+  async findOne(id: string) {
+    return await this.showModel.findById(id);
   }
 
-  create(show: Show) {
-    let lastIndex = 0;
-    if (this.shows.length > 0) {
-      lastIndex = this.shows[this.shows.length - 1].id + 1;
-    }
-
-    show.id = lastIndex;
-
-    this.shows.push(show);
-    return show;
+  async create(createShowDto: CreateShowDto): Promise<ShowDocument> {
+    const createdShow = new this.showModel(createShowDto);
+    return await createdShow.save();
   }
 
-  update(id: number, show: Show): void {
-    const showIdToUpdate = this.shows.findIndex((s) => s.id === id);
+  async update(id: string, show: Show): Promise<ShowDocument> {
+    await this.showModel.updateOne({ _id: id }, show).exec();
 
-    this.shows[showIdToUpdate] = show;
+    return this.showModel.findById(id);
   }
 
-  remove(id: number) {
-    const showIdToRemove = this.shows.findIndex((s) => s.id === id);
-
-    this.shows.splice(showIdToRemove, 1);
+  async remove(id: string): Promise<void> {
+    await this.showModel.deleteOne({ _id: id });
   }
 }

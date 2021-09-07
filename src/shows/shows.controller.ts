@@ -3,12 +3,13 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { ShowsService } from './shows.service';
-import { Show } from './entities/show.entity';
+import { CreateShowDto } from './dto/create-show.dto';
+import { ShowDocument } from './schemas/show.schema';
 
 @Controller('shows')
 export class ShowsController {
@@ -16,27 +17,30 @@ export class ShowsController {
   constructor(private readonly showsService: ShowsService) { }
 
   @Get()
-  async findAll(): Promise<Show[]> {
+  async findAll(): Promise<ShowDocument[]> {
     return this.showsService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Show> {
-    return this.showsService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<ShowDocument> {
+    return this.showsService.findOne(id);
   }
 
   @Post()
-  async create(@Body() show: Show): Promise<Show> {
-    return this.showsService.create(show);
+  async create(@Body() createShowDto: CreateShowDto): Promise<CreateShowDto> {
+    return this.showsService.create(createShowDto);
   }
 
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() show: Show): Promise<void> {
-    this.showsService.update(+id, show);
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() show: ShowDocument,
+  ): Promise<ShowDocument> {
+    return this.showsService.update(id, show);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
-    this.showsService.remove(+id);
+    this.showsService.remove(id);
   }
 }
