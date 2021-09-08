@@ -1,45 +1,35 @@
 import { Injectable } from '@nestjs/common';
-// import { CreateShowDto } from './dto/create-show.dto';
-import { UpdateShowDto } from './dto/update-show.dto';
-import { Show } from './entities/show.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { MongoRepository, ObjectID } from 'typeorm';
+import { Show } from './show.entity';
 
 @Injectable()
 export class ShowsService {
-  shows: Show[] = [
-    { id: 1, name: 'Modern Family', genre: 'Comedy', stars: 5 },
-    { id: 2, name: 'The Office', genre: 'Comedy', stars: 5 },
-    { id: 3, name: 'La Casa de Papel', genre: 'Drama', stars: 4 },
-  ];
+  constructor(
+    @InjectRepository(Show)
+    public readonly showsRepository: MongoRepository<Show>,
+  ) { }
 
-  findAll() {
-    return this.shows;
+  async findAll(): Promise<Show[]> {
+    // return [];
+    return await this.showsRepository.find();
   }
 
-  findOne(id: number) {
-    return this.shows.find((show) => show.id === id);
+  async findOne(id: string) {
+    return this.showsRepository.findOne(id);
   }
 
-  create(show: Show) {
-    let lastIndex = 0;
-    if (this.shows.length > 0) {
-      lastIndex = this.shows[this.shows.length - 1].id + 1;
-    }
-
-    show.id = lastIndex;
-
-    this.shows.push(show);
-    return show;
+  async create(show: Show) {
+    return await this.showsRepository.save(show);
   }
 
-  update(id: number, show: Show): void {
-    const showIdToUpdate = this.shows.findIndex((s) => s.id === id);
+  async update(_id: string, show: Show): Promise<Show> {
+    await this.showsRepository.update(_id, show);
 
-    this.shows[showIdToUpdate] = show;
+    return this.showsRepository.findOne(_id);
   }
 
-  remove(id: number) {
-    const showIdToRemove = this.shows.findIndex((s) => s.id === id);
-
-    this.shows.splice(showIdToRemove, 1);
+  async remove(_id: string): Promise<void> {
+    await this.showsRepository.delete(_id);
   }
 }
