@@ -26,6 +26,12 @@ export class ShowsController {
     return this.showsService.findOne(id);
   }
 
+  @Post('/random')
+  //TODO: change to a Get operation and find out why it's not working
+  async findRandom(): Promise<ShowDocument> {
+    return this.showsService.findRandom();
+  }
+
   @Post()
   async create(@Body() createShowDto: CreateShowDto): Promise<CreateShowDto> {
     return this.showsService.create(createShowDto);

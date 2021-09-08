@@ -1,8 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateShowDto } from './dto/create-show.dto';
-// import { UpdateShowDto } from './dto/update-show.dto';
 import { Show } from './entities/show.entity';
 import { ShowDocument } from './schemas/show.schema';
 
@@ -16,6 +15,11 @@ export class ShowsService {
 
   async findOne(id: string) {
     return await this.showModel.findById(id);
+  }
+
+  async findRandom() {
+    const all = await this.showModel.find().exec();
+    return all[Math.floor(Math.random() * all.length)];
   }
 
   async create(createShowDto: CreateShowDto): Promise<ShowDocument> {
